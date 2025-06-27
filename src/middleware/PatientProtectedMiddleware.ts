@@ -1,19 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import Doctors from "../models/DoctorSchema";
+import Patients from "../models/PatientSchema";
 
 interface CustomJwtPayload extends JwtPayload {
   id: string;
 }
 
-export const DoctorProtectedMiddleware = async (
+export const PatientProtectedMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { docToken } = req.cookies;
-    if (!docToken) {
+    const { patientToken } = req.cookies;
+    if (!patientToken) {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
@@ -24,22 +25,22 @@ export const DoctorProtectedMiddleware = async (
       return;
     }
 
-    const decode = jwt.verify(docToken, secret) as CustomJwtPayload;
+    const decode = jwt.verify(patientToken, secret) as CustomJwtPayload;
 
     if (!decode || !decode.id) {
       res.status(401).json({ message: "Invalid token" });
       return;
     }
 
-    const doctor = await Doctors.findOne({ _id: decode.id }).select(
+    const patient = await Patients.findOne({ _id: decode.id }).select(
       "-password"
     );
 
-    if (!doctor) {
-      res.status(401).json({ message: "doctor not found " });
+    if (!patient) {
+      res.status(401).json({ message: "patient not found " });
       return;
     }
-    req.doctor = doctor;
+    req.patients = patient;
     next();
   } catch (error) {
     console.log("error in protected middleware", error);

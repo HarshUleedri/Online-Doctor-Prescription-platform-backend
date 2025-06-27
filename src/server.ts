@@ -3,12 +3,15 @@ import dotenv from "dotenv";
 import { connection } from "./config/db";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { IDoctor } from "./models/DoctorSchema";
+import { IPatient } from "./models/PatientSchema";
 
 //adding type in for doctorId and userId  in express for req
 declare global {
   namespace Express {
     interface Request {
-      doctor?: IDoctor; // or whatever type your userId should be
+      doctor?: IDoctor;
+      patients?: IPatient; // or whatever type your userId should be
     }
   }
 }
@@ -16,7 +19,7 @@ declare global {
 // routers import
 
 import doctorAuth from "./routes/doctorAuthRoutes/doctorAuthRoutes";
-import { IDoctor } from "./models/DoctorSchema";
+import patientAuth from "./routes/patientAuthRoutes/patientAuthRoutes";
 
 dotenv.config();
 
@@ -36,6 +39,7 @@ app.use("/api/v1/testing", (req: Request, res: Response) => {
   res.send("working");
 });
 app.use("/api/v1/doctor/", doctorAuth);
+app.use("/api/v1/patient/", patientAuth);
 
 //server config
 
