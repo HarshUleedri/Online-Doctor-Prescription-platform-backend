@@ -15,7 +15,7 @@ router.post(
   "/me",
   PatientProtectedMiddleware,
   (req: Request, res: Response) => {
-    res.status(200).json({ patient: req.patients });
+    res.status(200).json({ patient: req.patient });
   }
 );
 

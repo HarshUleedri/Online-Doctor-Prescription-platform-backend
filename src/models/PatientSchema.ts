@@ -9,6 +9,8 @@ export interface IPatient extends Document {
   password: string;
   historyOfSurgery: string[];
   historyOfIllness: string[];
+  createdAt: Date;
+  updatedAt: Date;
   comparePassword: (enteredPassword: string) => Promise<boolean>;
 }
 

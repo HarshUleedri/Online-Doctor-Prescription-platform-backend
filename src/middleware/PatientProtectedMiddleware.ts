@@ -40,7 +40,7 @@ export const PatientProtectedMiddleware = async (
       res.status(401).json({ message: "patient not found " });
       return;
     }
-    req.patients = patient;
+    req.patient = patient;
     next();
   } catch (error) {
     console.log("error in protected middleware", error);

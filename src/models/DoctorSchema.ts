@@ -9,6 +9,8 @@ export interface IDoctor extends Document {
   phone: string;
   password: string;
   experience: number;
+  createdAt: Date;
+  updatedAt: Date;
   comparePassword: (enteredPassword: string) => Promise<boolean>;
 }
 

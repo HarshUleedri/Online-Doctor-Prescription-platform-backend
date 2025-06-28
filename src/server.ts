@@ -11,7 +11,7 @@ declare global {
   namespace Express {
     interface Request {
       doctor?: IDoctor;
-      patients?: IPatient; // or whatever type your userId should be
+      patient?: IPatient; // or whatever type your userId should be
     }
   }
 }
@@ -20,6 +20,7 @@ declare global {
 
 import doctorAuth from "./routes/doctorAuthRoutes/doctorAuthRoutes";
 import patientAuth from "./routes/patientAuthRoutes/patientAuthRoutes";
+import consultationsRoute from "./routes/ConsultationRoutes/ConsultationRoutes";
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use("/api/v1/testing", (req: Request, res: Response) => {
 });
 app.use("/api/v1/doctor/", doctorAuth);
 app.use("/api/v1/patient/", patientAuth);
+app.use("/api/v1/consultations", consultationsRoute);
 
 //server config
 
