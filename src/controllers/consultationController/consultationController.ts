@@ -15,6 +15,8 @@ export const createConsultation = async (req: Request, res: Response) => {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
+
+    console.log(req.body);
     if (
       !doctorId ||
       !currentIllnessHistory ||

@@ -7,6 +7,8 @@ export const doctorSignUp = async (req: Request, res: Response) => {
     const { name, profilePic, specialty, email, phone, password, experience } =
       req.body;
 
+    console.log(req.body);
+
     if (!name || !email || !password || !specialty || !phone || !experience) {
       res.status(400).json({ message: "ALL fields are required" });
       return;
@@ -67,7 +69,6 @@ export const doctorSignUp = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server Error" });
   }
 };
-
 export const doctorLogin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -110,6 +111,36 @@ export const doctorLogout = async (req: Request, res: Response) => {
     res.json({ message: "logged out" });
   } catch (error) {
     console.log("Error at doctor logout controller", error);
+    res.status(500).json({ message: "Internal server Error" });
+  }
+};
+export const getAllDoctor = async (req: Request, res: Response) => {
+  try {
+    const doctors = await Doctors.find();
+    res.status(200).json({ doctors });
+  } catch (error) {
+    console.log("Error at get all doctors  controller", error);
+    res.status(500).json({ message: "Internal server Error" });
+  }
+};
+
+export const getSingleDoctor = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      res.status(400).json({ message: "bad request id is required" });
+      return;
+    }
+
+    const doctor = await Doctors.findOne({ _id: id });
+
+    if (!doctor) {
+      res.status(404).json({ message: "Not Found" });
+      return;
+    }
+    res.status(200).json({ doctor });
+  } catch (error) {
+    console.log("Error at get single doctor  controller", error);
     res.status(500).json({ message: "Internal server Error" });
   }
 };

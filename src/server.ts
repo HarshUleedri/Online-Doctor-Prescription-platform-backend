@@ -21,6 +21,7 @@ declare global {
 import doctorAuth from "./routes/doctorAuthRoutes/doctorAuthRoutes";
 import patientAuth from "./routes/patientAuthRoutes/patientAuthRoutes";
 import consultationsRoute from "./routes/ConsultationRoutes/ConsultationRoutes";
+import imageUploadRoutes from "./routes/imageUploadRoutes/imageUploadRoutes";
 
 dotenv.config();
 
@@ -29,7 +30,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -42,6 +43,7 @@ app.use("/api/v1/testing", (req: Request, res: Response) => {
 app.use("/api/v1/doctor/", doctorAuth);
 app.use("/api/v1/patient/", patientAuth);
 app.use("/api/v1/consultations", consultationsRoute);
+app.use("/api/v1/upload", imageUploadRoutes);
 
 //server config
 

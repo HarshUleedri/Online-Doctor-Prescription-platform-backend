@@ -8,6 +8,9 @@ export interface IDoctor extends Document {
   email: string;
   phone: string;
   password: string;
+  role: "doctor";
+  upiId: string;
+  consultancyAmount: number;
   experience: number;
   createdAt: Date;
   updatedAt: Date;
@@ -19,6 +22,9 @@ const DoctorSchema = new mongoose.Schema(
     name: { type: String, required: true },
     profilePic: { type: String, default: "" },
     specialty: { type: String, required: true },
+    role: { type: String, default: "doctor" },
+    upiId: { type: String, default: "" },
+    consultancyAmount: { type: Number, default: 0 },
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },

@@ -7,6 +7,7 @@ export interface IPatient extends Document {
   email: string;
   phone: string;
   password: string;
+  role: "patient";
   historyOfSurgery: string[];
   historyOfIllness: string[];
   createdAt: Date;
@@ -22,7 +23,7 @@ const PatientSchema = new mongoose.Schema(
     email: { type: String, unique: true },
     password: { type: String, required: true },
     phone: { type: String, unique: true },
-
+    role: { type: String, default: "patient" },
     historyOfSurgery: { type: [String], default: [] }, // array of strings
     historyOfIllness: { type: [String], default: [] }, // array of strings
   },

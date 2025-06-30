@@ -21,12 +21,12 @@ const PrescriptionSchema = new mongoose.Schema(
     },
     doctorId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Doctor",
+      ref: "Doctors",
       required: true,
     },
     patientId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Patient",
+      ref: "Patients",
       required: true,
     },
     careToBeTaken: {

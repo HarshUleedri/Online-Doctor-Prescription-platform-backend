@@ -10,10 +10,10 @@ import { PatientProtectedMiddleware } from "../../middleware/PatientProtectedMid
 
 const router = express.Router();
 
-router.post("/", DoctorProtectedMiddleware, createConsultation);
+router.post("/", PatientProtectedMiddleware, createConsultation);
 router.get("/doctor", DoctorProtectedMiddleware, getConsultationForDoctor);
 router.get("/patient", PatientProtectedMiddleware, getConsultationForPatient);
-router.get("/:id", DoctorProtectedMiddleware, getSingleConsultationForDoctor);
-router.get("/:id", PatientProtectedMiddleware, getConsultationForPatient);
+router.get("single/:id", DoctorProtectedMiddleware, getSingleConsultationForDoctor);
+router.get("all/:id", PatientProtectedMiddleware, getConsultationForPatient);
 
 export default router;

@@ -23,12 +23,12 @@ const ConsultationSchema = new mongoose.Schema(
   {
     patientId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Patient",
+      ref: "Patients",
       required: true,
     },
     doctorId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Doctor",
+      ref: "Doctors",
       required: true,
     },
     currentIllnessHistory: {

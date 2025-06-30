@@ -11,7 +11,7 @@ const router = express.Router();
 router.post("/signup", patientsSignUp);
 router.post("/login", patientLogin);
 router.post("/logout", PatientLogout);
-router.post(
+router.get(
   "/me",
   PatientProtectedMiddleware,
   (req: Request, res: Response) => {
