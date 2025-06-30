@@ -66,7 +66,7 @@ export const patientsSignUp = async (req: Request, res: Response) => {
 
     res.cookie("patientToken", patientAccessToken, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "none",
       secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -103,7 +103,7 @@ export const patientLogin = async (req: Request, res: Response) => {
     res.cookie("patientToken", patientAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
