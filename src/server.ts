@@ -30,7 +30,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:5173"
+        : "https://online-doctor-prescription-platform-frontend-3jgvrw0l7.vercel.app/",
     credentials: true,
   })
 );
