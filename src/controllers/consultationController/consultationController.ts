@@ -88,7 +88,7 @@ export const getConsultationForPatient = async (
       return;
     }
     const consultations = await Consultations.find({ patientId })
-      .populate("doctorId", "name specialty profilePicture")
+      .populate("doctorId", "name specialty profilePic")
       .sort({ createdAt: -1 });
 
     res.json({ consultations });

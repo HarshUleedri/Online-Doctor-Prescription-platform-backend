@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { generateAccessToken } from "../../utils/generateToken";
 import Patients from "../../models/PatientSchema";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const patientsSignUp = async (req: Request, res: Response) => {
   try {
     const {
@@ -66,8 +68,8 @@ export const patientsSignUp = async (req: Request, res: Response) => {
 
     res.cookie("patientToken", patientAccessToken, {
       httpOnly: true,
-      sameSite: "none",
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction, // ✅ true only in production (HTTPS)
+      sameSite: isProduction ? "none" : "lax", // ✅ "None" for cross-site production, "Lax" for local dev
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.status(201).json({ success: true, message: "Successful Sign Up" });
@@ -102,8 +104,8 @@ export const patientLogin = async (req: Request, res: Response) => {
 
     res.cookie("patientToken", patientAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      secure: isProduction, // ✅ true only in production (HTTPS)
+      sameSite: isProduction ? "none" : "lax", // ✅ "None" for cross-site production, "Lax" for local dev
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
