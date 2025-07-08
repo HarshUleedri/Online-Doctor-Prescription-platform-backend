@@ -67,7 +67,7 @@ export const getConsultationForDoctor = async (req: Request, res: Response) => {
       return;
     }
     const consultations = await Consultations.find({ doctorId })
-      .populate("patientId", "name age profilePicture")
+      .populate("patientId", "name age profilePic")
       .sort({ createdAt: -1 });
 
     res.json({ consultations });
@@ -136,10 +136,10 @@ export const getSingleConsultationForDoctor = async (
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
-
+    
     const consultation = await Consultations.findById(id)
-      .populate("doctorId", "name specialty profilePicture yearsOfExperience")
-      .populate("patientId", "name age profilePicture");
+      .populate("doctorId", "name specialty profilePic yearsOfExperience")
+      .populate("patientId", "name age profilePic");
 
     if (!consultation) {
       res.status(404).json({ error: "Consultation not found" });

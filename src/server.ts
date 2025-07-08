@@ -22,6 +22,7 @@ import doctorAuth from "./routes/doctorAuthRoutes/doctorAuthRoutes";
 import patientAuth from "./routes/patientAuthRoutes/patientAuthRoutes";
 import consultationsRoute from "./routes/ConsultationRoutes/ConsultationRoutes";
 import imageUploadRoutes from "./routes/imageUploadRoutes/imageUploadRoutes";
+import prescriptionRoute from "./routes/PrescriptionRoutes/PrescriptionRoutes";
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.use("/api/v1/doctor/", doctorAuth);
 app.use("/api/v1/patient/", patientAuth);
 app.use("/api/v1/consultations", consultationsRoute);
 app.use("/api/v1/upload", imageUploadRoutes);
+app.use("/api/v1/prescription", prescriptionRoute);
 
 //server config
 

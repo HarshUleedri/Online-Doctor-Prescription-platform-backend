@@ -1,10 +1,7 @@
 import puppeteer from "puppeteer";
-import path from "path";
-import fs from "fs";
+import imageKit from "./imagekitConfig";
 
-export const generatePrescriptionPDF = async (
-  prescriptionData: any
-): Promise<string> => {
+export const generatePrescriptionPDF = async (prescriptionData: any) => {
   const browser = await puppeteer.launch({
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -83,34 +80,30 @@ export const generatePrescriptionPDF = async (
 
     await page.setContent(htmlContent);
 
-    const pdfFileName = `prescription-${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 9)}.pdf`;
-    const pdfPath = path.join(
-      __dirname,
-      "../../uploads/prescriptions",
-      pdfFileName
+    const pdfBuffer = Buffer.from(
+      await page.pdf({
+        format: "A4",
+        printBackground: true,
+        margin: {
+          top: "20px",
+          right: "20px",
+          bottom: "20px",
+          left: "20px",
+        },
+      })
     );
 
-    // Ensure directory exists
-    const dir = path.dirname(pdfPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
+    const fileName = `prescription_${prescriptionData.patientName}.pdf`;
 
-    await page.pdf({
-      path: pdfPath,
-      format: "A4",
-      printBackground: true,
-      margin: {
-        top: "20px",
-        right: "20px",
-        bottom: "20px",
-        left: "20px",
-      },
+    const uploadedPdf = await imageKit.upload({
+      file: pdfBuffer,
+      fileName: fileName, // Ensures it overwrites if file name already exists
+      folder: "OnlineConsultationProject/prescriptions",
     });
-
-    return pdfPath;
+    if (!uploadedPdf || !uploadedPdf.url) {
+      throw new Error("failed to generate pdf url");
+    }
+    return uploadedPdf.url;
   } finally {
     await browser.close();
   }

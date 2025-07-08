@@ -13,7 +13,11 @@ const router = express.Router();
 router.post("/", PatientProtectedMiddleware, createConsultation);
 router.get("/doctor", DoctorProtectedMiddleware, getConsultationForDoctor);
 router.get("/patient", PatientProtectedMiddleware, getConsultationForPatient);
-router.get("single/:id", DoctorProtectedMiddleware, getSingleConsultationForDoctor);
-router.get("all/:id", PatientProtectedMiddleware, getConsultationForPatient);
+router.get(
+  "/single/:id",
+  DoctorProtectedMiddleware,
+  getSingleConsultationForDoctor
+);
+router.get("/all/:id", PatientProtectedMiddleware, getConsultationForPatient);
 
 export default router;

@@ -39,14 +39,9 @@ const PrescriptionSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
-    pdfPath: {
+    pdfUrl: {
       type: String,
       trim: true,
-    },
-    status: {
-      type: String,
-      enum: ["draft", "sent"],
-      default: "draft",
     },
   },
   {

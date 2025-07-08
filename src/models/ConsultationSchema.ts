@@ -1,8 +1,10 @@
 import mongoose, { Document } from "mongoose";
+import { IDoctor } from "./DoctorSchema";
+import { IPatient } from "./PatientSchema";
 
 export interface IConsultation extends Document {
-  patientId: mongoose.Types.ObjectId;
-  doctorId: mongoose.Types.ObjectId;
+  patientId: mongoose.Types.ObjectId | Partial<IPatient>;
+  doctorId: mongoose.Types.ObjectId | Partial<IDoctor>;
   currentIllnessHistory: string;
   recentSurgery: {
     hasSurgery: boolean;

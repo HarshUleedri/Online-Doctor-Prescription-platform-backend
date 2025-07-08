@@ -4,107 +4,104 @@ import Prescriptions from "../../models/PrescriptionSchema";
 import { generatePrescriptionPDF } from "../../utils/generatePrescriptionPDF";
 import path from "path";
 import fs from "fs";
+import { IDoctor } from "../../models/DoctorSchema";
+import { IPatient } from "../../models/PatientSchema";
 
 export const createPrescription = async (req: Request, res: Response) => {
   try {
     const doctorId = req.doctor?._id;
-    const { consultationId, careToBeTaken, medicines } = req.body;
+    const { consultationId, patientId, careToBeTaken, medicines, pdfUrl } =
+      req.body;
 
-    // Verify consultation exists and belongs to this doctor
+    console.log(req.body);
+    if (!doctorId) {
+      res.status(401).json({ message: "Unauthorized" });
+    }
+    if (
+      !consultationId ||
+      !patientId ||
+      !careToBeTaken ||
+      !medicines ||
+      !pdfUrl
+    ) {
+      res.status(400).json({ message: "Bad Request All fields are required" });
+      return;
+    }
     const consultation = await Consultations.findOne({
       _id: consultationId,
-      doctorId,
-    })
-      .populate("patientId")
-      .populate("doctorId");
+    });
 
     if (!consultation) {
-      res
-        .status(404)
-        .json({ error: "Consultation not found or access denied" });
+      res.status(404).json({ message: "consultation not found" });
       return;
     }
 
-    // Check if prescription already exists
-    let prescription = await Prescriptions.findOne({ consultationId });
-
-    if (prescription) {
-      // Update existing prescription
-      prescription.careToBeTaken = careToBeTaken;
-      prescription.medicines = medicines || "";
-      prescription.status = "draft";
-      await prescription.save();
-    } else {
-      // Create new prescription
-      prescription = new Prescriptions({
-        consultationId,
-        doctorId,
-        patientId: consultation.patientId._id,
-        careToBeTaken,
-        medicines: medicines || "",
-        status: "draft",
-      });
-      await prescription.save();
+    const newPrescription = await Prescriptions.create({
+      consultationId,
+      doctorId,
+      patientId,
+      careToBeTaken,
+      medicines,
+      pdfUrl,
+    });
+    if (!newPrescription) {
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to create prescription" });
+      return;
     }
 
-    res.json({
-      message: prescription
-        ? "Prescription updated successfully"
-        : "Prescription created successfully",
-      prescription,
-    });
+    consultation.status = "completed";
+    await consultation.save();
+    res.status(201).json({ success: true, prescription: newPrescription });
   } catch (error) {
-    console.error("Create/Update prescription error:", error);
+    console.error("Create prescription error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
-export const generateAndSendPDF = async (req: Request, res: Response) => {
+export const generatePdfUrl = async (req: Request, res: Response) => {
   try {
-    const doctorId = req.doctor?._id;
-    const prescription = await Prescriptions.findOne({
-      _id: req.params.id,
-      doctorId,
+    const { consultationId, careToBeTaken, medicines } = req.body;
+
+    console.log(careToBeTaken, medicines);
+
+    if (!careToBeTaken || !medicines || !consultationId) {
+      res.status(400).json({ message: "All fields are required " });
+    }
+
+    const consultation = await Consultations.findOne({
+      _id: consultationId,
     }).populate([
-      { path: "consultationId" },
-      { path: "doctorId", select: "name specialty yearsOfExperience" },
       { path: "patientId", select: "name age" },
+      { path: "doctorId", select: "name specialty experience  " },
     ]);
 
-    if (!prescription) {
-      res
-        .status(404)
-        .json({ error: "Prescription not found or access denied" });
-      return;
+    if (!consultation) {
+      res.status(404).json({ message: "Consultation is Invalid" });
     }
+
+    const doctor = consultation?.doctorId as IDoctor;
+    const patient = consultation?.patientId as IPatient;
 
     // Prepare data for PDF generation
     const pdfData = {
-      doctorName: (prescription.doctorId as any).name,
-      doctorSpecialty: (prescription.doctorId as any).specialty,
-      doctorExperience: (prescription.doctorId as any).yearsOfExperience,
-      patientName: (prescription.patientId as any).name,
-      patientAge: (prescription.patientId as any).age,
-      careToBeTaken: prescription.careToBeTaken,
-      medicines: prescription.medicines,
+      doctorName: doctor?.name,
+      doctorSpecialty: doctor?.specialty,
+      doctorExperience: doctor?.experience,
+      patientName: patient?.name,
+      patientAge: patient?.age,
+      careToBeTaken: careToBeTaken,
+      medicines: medicines,
     };
 
     // Generate PDF
-    const pdfPath = await generatePrescriptionPDF(pdfData);
+    const pdfUrl = await generatePrescriptionPDF(pdfData);
 
-    // Update prescription with PDF path
-    prescription.pdfPath = pdfPath;
-    prescription.status = "sent";
-    await prescription.save();
-
-    // Update consultation status
-    await Consultations.findByIdAndUpdate(prescription.consultationId, {
-      status: "completed",
-    });
-
-    res.json({
-      message: "Prescription PDF generated and sent successfully",
-      pdfPath: `/uploads/prescriptions/${path.basename(pdfPath)}`,
-    });
+    if (!pdfUrl) {
+      res.status(404).json({ message: "error generating pdf" });
+      return;
+    }
+    res.status(201).json({ success: true, pdfUrl });
   } catch (error) {
     console.error("Generate PDF error:", error);
     res.status(500).json({ error: "Failed to generate prescription PDF" });
@@ -121,7 +118,7 @@ export const getPrescriptionForDoctor = async (req: Request, res: Response) => {
     const prescriptions = await Prescriptions.find({ doctorId })
       .populate([
         { path: "consultationId" },
-        { path: "patientId", select: "name age profilePicture" },
+        { path: "patientId", select: "name age profilePic" },
       ])
       .sort({ createdAt: -1 });
 
@@ -142,13 +139,9 @@ export const getPrescriptionForPatient = async (
       return;
     }
     const prescriptions = await Prescriptions.find({
-      patientId,
-      status: "sent", // Only show sent prescriptions to patients
+      patientId, // Only show sent prescriptions to patients
     })
-      .populate([
-        { path: "consultationId" },
-        { path: "doctorId", select: "name specialty profilePicture" },
-      ])
+      .populate([{ path: "doctorId", select: "name specialty profilePic" }])
       .sort({ createdAt: -1 });
 
     res.json({ prescriptions });
